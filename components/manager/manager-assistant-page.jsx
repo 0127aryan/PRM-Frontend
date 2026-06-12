@@ -100,8 +100,8 @@ export function ManagerAssistantPage() {
       ) : null}
 
       <p className="mb-8 max-w-2xl text-sm text-slate-600">
-        Skill match and risk summaries use your team and project data with
-        keyword/rules today (LLM when Phase 9 is enabled). Always verify
+        Skill match uses natural language AI when configured; risk summaries use
+        milestone and timesheet data with AI (rule-based fallback). Always verify
         suggestions before allocating.
       </p>
 

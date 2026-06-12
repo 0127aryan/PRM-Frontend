@@ -28,6 +28,7 @@ const MATCHING_OPTIONS = [
 const LLM_PROVIDERS = [
   { value: 'gemini', label: 'Gemini' },
   { value: 'groq', label: 'Groq' },
+  { value: 'gemma', label: 'Gemma' },
 ];
 
 export function AdminSettingsPage() {
@@ -99,13 +100,16 @@ export function AdminSettingsPage() {
         setError('Scheduler interval must be between 1 and 168 hours.');
         return;
       }
-      await adminService.patchSettingsConfig({
+      const payload = {
         [CONFIG_KEYS.maxWeeklyHours]: String(hours),
         [CONFIG_KEYS.schedulerIntervalHours]: String(interval),
         [CONFIG_KEYS.matchingMode]: matchingMode,
         [CONFIG_KEYS.llmProvider]: llmProvider,
-        [CONFIG_KEYS.llmApiKey]: llmApiKey,
-      });
+      };
+      if (llmApiKey.trim()) {
+        payload[CONFIG_KEYS.llmApiKey] = llmApiKey.trim();
+      }
+      await adminService.patchSettingsConfig(payload);
       setMessage('Settings saved successfully.');
       await load();
     } catch (err) {

@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
  * @param {{
  *   matches: Array<object>,
  *   mode?: string,
+ *   notice?: string,
  *   onAllocate?: (match: object) => void,
  *   showAllocateActions?: boolean,
  * }} props
@@ -21,16 +22,21 @@ import { cn } from '@/lib/utils';
 export function ManagerMatchResults({
   matches,
   mode = 'keyword',
+  notice,
   onAllocate,
   showAllocateActions = true,
 }) {
   if (!matches?.length) {
     return (
       <div className="rounded-xl border border-dashed border-slate-200 bg-white px-8 py-12 text-center">
-        <p className="font-medium text-slate-900">No matches found</p>
-        <p className="mt-2 text-sm text-slate-500">
-          Try different keywords or clear filters to list all direct reports.
+        <p className="font-medium text-slate-900">
+          {notice || 'No matches found'}
         </p>
+        {!notice ? (
+          <p className="mt-2 text-sm text-slate-500">
+            Try different keywords or clear filters to list all direct reports.
+          </p>
+        ) : null}
       </div>
     );
   }

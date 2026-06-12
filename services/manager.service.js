@@ -58,7 +58,7 @@ export function endAllocation(allocationId, body = {}) {
   });
 }
 
-/** @param {{ projectId?: number, keywords?: string[], skillIds?: number[] }} body */
+/** @param {{ projectId?: number, query?: string, keywords?: string[], skillIds?: number[] }} body */
 export function searchMatching(body) {
   return apiFetch('/manager/matching/search', {
     method: 'POST',
@@ -66,7 +66,7 @@ export function searchMatching(body) {
   });
 }
 
-/** @param {{ projectId?: number, keywords?: string[], skillIds?: number[] }} body */
+/** @param {{ projectId?: number, query?: string, keywords?: string[], skillIds?: number[] }} body */
 export function assistantSkillMatch(body) {
   return apiFetch('/manager/assistant/skill-match', {
     method: 'POST',

@@ -3,10 +3,6 @@
 import { Loader2, Search } from 'lucide-react';
 import { useState } from 'react';
 import { ManagerMatchResults } from '@/components/manager/manager-match-results';
-import {
-  matchingModeLabel,
-  parseRequirementKeywords,
-} from '@/lib/manager/matching-display';
 import * as managerService from '@/services/manager.service';
 
 /**
@@ -38,9 +34,8 @@ export function ManagerResourceSearch({
     setSearching(true);
     setResult(null);
     try {
-      const keywords = parseRequirementKeywords(requirement);
       const body = {
-        keywords: keywords.length ? keywords : undefined,
+        query: requirement.trim() || undefined,
         projectId: projectId ? Number(projectId) : undefined,
       };
       const data = await managerService.searchMatching(body);
@@ -96,8 +91,8 @@ export function ManagerResourceSearch({
               className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
             />
             <p className="mt-2 text-xs text-slate-500">
-              Plain English is fine — we extract keywords and match against your
-              direct reports&apos; skills ({matchingModeLabel('keyword')}).
+              Plain English is processed by AI when LLM is configured in Admin
+              settings; otherwise keyword matching is used as a fallback.
             </p>
           </div>
         </div>
@@ -120,10 +115,17 @@ export function ManagerResourceSearch({
         </button>
       </form>
 
+      {result?.llmNotice ? (
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {result.llmNotice}
+        </p>
+      ) : null}
+
       {result ? (
         <ManagerMatchResults
           matches={result.matches}
           mode={result.mode}
+          notice={result.notice}
           onAllocate={onAllocate}
           showAllocateActions={showAllocateActions && Boolean(onAllocate)}
         />
