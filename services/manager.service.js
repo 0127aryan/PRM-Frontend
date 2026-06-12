@@ -81,3 +81,12 @@ export function assistantRiskSummary(body) {
     body: JSON.stringify(body),
   });
 }
+
+/** @param {{ query: string, projectId?: number }} body */
+export function buildTeam(body) {
+  return apiFetch('/manager/team-builder', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+

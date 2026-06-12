@@ -9,12 +9,14 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { ManagerResourceSearch } from '@/components/manager/manager-resource-search';
+import { ManagerTeamBuilder } from '@/components/manager/manager-team-builder';
 import {
   projectHealthClass,
   projectHealthLabel,
 } from '@/lib/manager/matching-display';
 import { cn } from '@/lib/utils';
 import * as managerService from '@/services/manager.service';
+
 
 export function ManagerAssistantPage() {
   const searchParams = useSearchParams();
@@ -24,6 +26,7 @@ export function ManagerAssistantPage() {
   const [error, setError] = useState('');
   const [projects, setProjects] = useState([]);
   const [skillProjectId, setSkillProjectId] = useState('');
+  const [teamProjectId, setTeamProjectId] = useState('');
   const [riskProjectId, setRiskProjectId] = useState('');
   const [riskLoading, setRiskLoading] = useState(false);
   const [riskResult, setRiskResult] = useState(null);
@@ -44,7 +47,9 @@ export function ManagerAssistantPage() {
       setRiskProjectId((prev) => prev || preferred);
       if (urlProjectId && p.some((x) => String(x.id) === urlProjectId)) {
         setSkillProjectId(urlProjectId);
+        setTeamProjectId(urlProjectId);
       }
+
     } catch (err) {
       setError(err.message || 'Failed to load projects.');
     } finally {
@@ -107,6 +112,18 @@ export function ManagerAssistantPage() {
 
       <section className="mb-12">
         <div className="mb-4 flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-indigo-600" aria-hidden />
+          <h3 className="text-lg font-semibold text-slate-900">Team builder</h3>
+        </div>
+        <ManagerTeamBuilder
+          projects={projects}
+          projectId={teamProjectId}
+          onProjectIdChange={setTeamProjectId}
+        />
+      </section>
+
+      <section className="mb-12">
+        <div className="mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-slate-900" aria-hidden />
           <h3 className="text-lg font-semibold text-slate-900">Skill match</h3>
         </div>
@@ -117,6 +134,7 @@ export function ManagerAssistantPage() {
           showAllocateActions={false}
           submitLabel="Find best employees"
         />
+
         {skillProjectId ? (
           <p className="mt-4 text-sm text-slate-600">
             Ready to allocate?{' '}
