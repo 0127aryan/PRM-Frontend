@@ -90,3 +90,7 @@ export function buildTeam(body) {
   });
 }
 
+export function unfreezeEmployee(employeeId) {
+  return apiFetch(`/manager/employees/${employeeId}/unfreeze`, { method: 'POST' });
+}
+

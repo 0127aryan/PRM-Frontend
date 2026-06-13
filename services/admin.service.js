@@ -107,3 +107,7 @@ export function issueSetupLink(userId) {
 export function resetPassword(userId) {
   return apiFetch(`/admin/users/${userId}/reset-password`, { method: 'POST' });
 }
+
+export function unfreezeUser(userId) {
+  return apiFetch(`/admin/users/${userId}/unfreeze`, { method: 'POST' });
+}

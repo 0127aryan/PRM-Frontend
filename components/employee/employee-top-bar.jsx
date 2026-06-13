@@ -2,6 +2,7 @@
 
 import { Calendar } from 'lucide-react';
 import { formatDateDDMMYYYY } from '@/lib/format';
+import { NotificationCenter } from '@/components/ui/notification-center';
 
 /**
  * @param {{ title: string, subtitle?: string, user?: { email?: string, username?: string } | null }} props
@@ -23,6 +24,7 @@ export function EmployeeTopBar({ title, subtitle, user }) {
           <Calendar className="h-4 w-4 text-slate-900" aria-hidden />
           <span>{today}</span>
         </div>
+        <NotificationCenter />
         <div className="h-8 w-px bg-slate-200" />
         <div className="text-right">
           <p className="text-sm font-medium text-slate-900">{displayName}</p>

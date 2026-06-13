@@ -7,6 +7,7 @@ import {
   RotateCcw,
   Search,
   UserX,
+  Unlock,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { StatusBadge } from '@/components/admin/status-badge';
@@ -26,12 +27,14 @@ function initials(name) {
 function accountVariant(status) {
   if (status === 'PENDING_PASSWORD') return 'pending';
   if (status === 'ACTIVE') return 'active';
+  if (status === 'FROZEN') return 'frozen';
   return 'inactive';
 }
 
 function accountLabel(status) {
   if (status === 'PENDING_PASSWORD') return 'Pending password';
   if (status === 'ACTIVE') return 'Active';
+  if (status === 'FROZEN') return 'Frozen';
   return 'Inactive';
 }
 
@@ -224,6 +227,18 @@ export function UsersTable({ rows, onRefresh }) {
                           <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
                         ) : (
                           <>
+                            {row.accountStatus === 'FROZEN' ? (
+                              <IconButton
+                                title="Unfreeze account"
+                                onClick={() =>
+                                  runAction(row.userId, () =>
+                                    adminService.unfreezeUser(row.userId),
+                                  )
+                                }
+                              >
+                                <Unlock className="h-4 w-4 text-amber-600" />
+                              </IconButton>
+                            ) : null}
                             <IconButton
                               title="Copy set-password page link (email prefilled)"
                               onClick={() => copySetupLink(row.userId)}

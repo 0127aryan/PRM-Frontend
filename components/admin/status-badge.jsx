@@ -8,6 +8,7 @@ const variants = {
   pending: 'bg-orange-50 text-orange-800',
   active: 'bg-emerald-50 text-emerald-800',
   inactive: 'bg-red-50 text-red-800',
+  frozen: 'bg-amber-100 text-amber-900 border border-amber-200',
 };
 
 /**

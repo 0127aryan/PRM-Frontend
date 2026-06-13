@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Loader2,
   Mail,
+  Unlock,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -41,6 +42,7 @@ export function ManagerEmployeeDetailPage({ employeeId }) {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [weekHistory, setWeekHistory] = useState([]);
   const [historyOffset, setHistoryOffset] = useState(0);
+  const [unfreezing, setUnfreezing] = useState(false);
 
   const loadEmployee = useCallback(async () => {
     setLoading(true);
@@ -55,6 +57,18 @@ export function ManagerEmployeeDetailPage({ employeeId }) {
       setLoading(false);
     }
   }, [employeeId]);
+
+  async function handleUnfreeze() {
+    setUnfreezing(true);
+    try {
+      await managerService.unfreezeEmployee(employeeId);
+      await loadEmployee();
+    } catch (err) {
+      alert(err.message || 'Failed to unfreeze account.');
+    } finally {
+      setUnfreezing(false);
+    }
+  }
 
   const weekStarts = useMemo(() => {
     const base = recentMondayWeekStarts(HISTORY_WEEKS + historyOffset);
@@ -118,7 +132,7 @@ export function ManagerEmployeeDetailPage({ employeeId }) {
     [employee],
   );
 
-  const statusStyle = employeeStatusClass(employee?.status);
+  const statusStyle = employeeStatusClass(employee?.status, employee?.accountStatus);
   const initials = employeeInitials(employee?.fullName);
 
   if (loading) {
@@ -160,6 +174,31 @@ export function ManagerEmployeeDetailPage({ employeeId }) {
         Back to direct reports
       </Link>
 
+      {employee.accountStatus === 'FROZEN' && (
+        <div className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-6 py-4 text-sm text-amber-900 shadow-sm animate-in fade-in duration-200">
+          <div className="flex items-start gap-3">
+            <span className="text-xl">⚠️</span>
+            <div>
+              <p className="font-semibold text-slate-900">Account access is frozen</p>
+              <p className="text-slate-600 mt-0.5">This employee's account has been frozen due to 2+ consecutive missed timesheet submissions. They cannot log in to submit timesheets.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleUnfreeze}
+            disabled={unfreezing}
+            className="rounded-lg bg-amber-600 hover:bg-amber-700 px-5 py-2 text-xs font-semibold text-white transition disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+          >
+            {unfreezing ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Unlock className="h-3.5 w-3.5" />
+            )}
+            Unfreeze Account
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <section className="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-8 lg:col-span-8">
           <div className="absolute -right-8 -top-8 h-32 w-32 rounded-bl-full bg-slate-900/5" />
@@ -189,7 +228,7 @@ export function ManagerEmployeeDetailPage({ employeeId }) {
                   )}
                 >
                   <span className={cn('h-1.5 w-1.5 rounded-full', statusStyle.dot)} />
-                  {employeeStatusLabel(employee.status)}
+                  {employeeStatusLabel(employee.status, employee.accountStatus)}
                 </span>
               </div>
               <dl className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">

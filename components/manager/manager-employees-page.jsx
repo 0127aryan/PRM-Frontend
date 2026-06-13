@@ -209,7 +209,7 @@ function StatCard({ label, value, icon: Icon, iconClass, valueClass }) {
 }
 
 function EmployeeRow({ employee }) {
-  const statusStyle = employeeStatusClass(employee.status);
+  const statusStyle = employeeStatusClass(employee.status, employee.accountStatus);
   const initials = employeeInitials(employee.fullName);
 
   return (
@@ -244,7 +244,7 @@ function EmployeeRow({ employee }) {
           )}
         >
           <span className={cn('h-1.5 w-1.5 rounded-full', statusStyle.dot)} />
-          {employeeStatusLabel(employee.status)}
+          {employeeStatusLabel(employee.status, employee.accountStatus)}
         </span>
       </td>
       <td className="px-6 py-3 text-slate-700">
