@@ -1,0 +1,149 @@
+'use client';
+
+import { useState } from 'react';
+import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import * as managerService from '@/services/manager.service';
+import { cn } from '@/lib/utils';
+import { TeamBuilderGaps } from './team-builder-gaps';
+import { TeamBuilderOptionCard } from './team-builder-option-card';
+
+export function ManagerTeamBuilder({ projects, projectId, onProjectIdChange }) {
+  const [requirement, setRequirement] = useState('');
+  const [building, setBuilding] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState(null);
+
+  async function handleBuildTeam(e) {
+    e.preventDefault();
+    setError('');
+    setBuilding(true);
+    setResult(null);
+    try {
+      const body = {
+        query: requirement.trim() || undefined,
+        projectId: projectId ? Number(projectId) : undefined,
+      };
+      const data = await managerService.buildTeam(body);
+      setResult(data);
+    } catch (err) {
+      setError(err.message || 'Team Builder failed to run.');
+    } finally {
+      setBuilding(false);
+    }
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Input section with custom premium styling */}
+      <form
+        onSubmit={handleBuildTeam}
+        className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md transition-all duration-300 hover:shadow-lg"
+      >
+        <div className="absolute right-0 top-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-indigo-50/50 blur-xl" />
+        <div className="absolute left-0 bottom-0 -ml-6 -mb-6 h-24 w-24 rounded-full bg-cyan-50/50 blur-xl" />
+
+        <div className="relative space-y-5">
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="md:col-span-2">
+              <label
+                htmlFor="tb-requirement"
+                className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+              >
+                Describe your desired team
+              </label>
+              <textarea
+                id="tb-requirement"
+                value={requirement}
+                onChange={(e) => setRequirement(e.target.value)}
+                rows={3}
+                required
+                placeholder="e.g. I need a backend, frontend, devops and QA"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition-all focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 placeholder:text-slate-400"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="tb-project"
+                className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+              >
+                Project context (optional)
+              </label>
+              <select
+                id="tb-project"
+                value={projectId}
+                onChange={(e) => onProjectIdChange(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10"
+              >
+                <option value="">Any project context</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
+                Matches are found from all over the organization, bypassing manager assignments.
+              </p>
+            </div>
+          </div>
+
+          {error ? (
+            <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden />
+              <div>
+                <p className="font-semibold">AI Generation Unavailable</p>
+                <p className="mt-1 text-xs text-red-700">{error}</p>
+              </div>
+            </div>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={building || !requirement.trim()}
+            className={cn(
+              "relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:from-indigo-500 hover:to-violet-500 hover:shadow-md active:scale-95 disabled:pointer-events-none disabled:opacity-60"
+            )}
+          >
+            {building ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <Sparkles className="h-4 w-4 text-indigo-200 animate-pulse" aria-hidden />
+            )}
+            {building ? 'Synthesizing team configuration…' : 'Build best possible teams'}
+          </button>
+        </div>
+      </form>
+
+      {/* Result Section */}
+      {result ? (
+        <div className="space-y-8">
+          {/* Gaps / Honesty panel */}
+          <TeamBuilderGaps gaps={result.gaps} />
+
+          {/* Team options side by side */}
+          <div>
+            <div className="mb-6 flex items-center justify-between">
+              <h4 className="text-base font-semibold text-slate-900">
+                Proposed Team Configurations
+              </h4>
+              <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700 border border-indigo-100">
+                AI Generated
+              </span>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {result.options.map((option, optIdx) => (
+                <TeamBuilderOptionCard
+                  key={optIdx}
+                  option={option}
+                  index={optIdx}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
